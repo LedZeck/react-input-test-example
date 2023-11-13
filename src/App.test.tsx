@@ -1,18 +1,24 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import App from './App';
 
+const setArrangement = () => {
+  render(<App />);
+  const input = screen.getByTestId('input-field');
+  const displayValue = screen.getByTestId('display-value');
+  return { input, displayValue };
+};
+
+const handleChange = jest.fn();
+
 describe('App', () => {
   it('renders App component', () => {
-    render(<App />);
-    const input = screen.getByTestId('input-field');
+    const { input } = setArrangement();
+
     expect(input).toBeInTheDocument();
   });
 
   it('should call onChange method when input value changes', () => {
-    const handleChange = jest.fn();
-    render(<App />);
-
-    const input = screen.getByTestId('input-field');
+    const { input } = setArrangement();
 
     input.addEventListener('change', handleChange);
     expect(handleChange).toHaveBeenCalledTimes(0);
@@ -22,18 +28,17 @@ describe('App', () => {
   });
 
   it('should display the initial value', () => {
-    render(<App />);
-    const displayValue = screen.getByTestId('display-value');
+    const { displayValue } = setArrangement();
+
     expect(displayValue).toHaveTextContent('Initial Input');
   });
 
   it('should display the new value', () => {
-    render(<App />);
-    const input = screen.getByTestId('input-field');
-    const displayValue = screen.getByTestId('display-value');
+    const { input, displayValue } = setArrangement();
 
     input.dispatchEvent(new Event('change', { bubbles: true }));
     fireEvent.change(input, { target: { value: 'Change' } });
+
     expect(displayValue).toHaveTextContent('Change');
   });
 });
